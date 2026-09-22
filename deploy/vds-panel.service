@@ -1,0 +1,15 @@
+[Unit]
+Description=VDS access panel (GUI)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/vds-panel
+EnvironmentFile=/etc/vds-panel.env
+ExecStart=/opt/vds-panel/venv/bin/python /opt/vds-panel/app.py
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

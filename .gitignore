@@ -1,2 +1,20 @@
 /vendor
 composer.lock
+# --- GUI panel (добавлено форком) ---
+/gui/panel.db
+/gui/*.db
+__pycache__/
+*.pyc
+/gui/venv/
+/gui/.venv/
+# секреты, которые нельзя коммитить
+.env
+*.key
+*.pem
+*.crt
+*.p12
+*.ovpn
+*.conf
+clients/
+backups/
+*.tar.gz
