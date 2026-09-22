@@ -130,7 +130,7 @@ LAYOUT = """<!doctype html><html lang="ru"><head><meta charset="utf-8">
 :root{--bg:#151517;--card:#1d1d21;--card2:#26262c;--line:#2c2c33;--fg:#ecedf1;--mut:#989aa4;--acc:#4d6bfe;--ok:#2ecc71;--err:#e74c3c;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;font-size:clamp(15px,0.25vw + 14.2px,17px);line-height:1.5;
 padding-bottom:calc(72px + env(safe-area-inset-bottom))}
 header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
 background:rgba(21,21,23,.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
@@ -164,7 +164,10 @@ padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
 nav.tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mut);
 text-decoration:none;font-size:11px;padding:6px 2px;border-radius:10px}
 nav.tabs a.on{color:var(--acc)}
-nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs svg{width:1.55em;height:1.55em;min-width:20px;min-height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.topnav{display:none;gap:2px;margin-left:8px;flex-wrap:wrap}
+.topnav a{font-size:.92em;padding:7px 10px;border-radius:9px;color:var(--mut);text-decoration:none}
+.topnav a.on{color:var(--fg);background:var(--card2)}
 @media (min-width:641px){body{padding-bottom:28px}nav.tabs{display:none}header .only-mobile{display:none}}
 @media (max-width:640px){
 thead{display:none}
@@ -377,9 +380,9 @@ def device_qr_page(did):
 def connect():
     b = render_template_string("""<h1>Подключение</h1>
 <p class="hint">Установите приложение под своё устройство и импортируйте ключ из кабинета.</p>
-<h2>PC</h2><div class="card"><table><tr><th>ОС</th><th>Приложение</th><th></th></tr>
+<h2>PC</h2><div class="card"><table><thead><tr><th>ОС</th><th>Приложение</th><th></th></tr></thead>
 {% for a in pc %}<tr><td>{{ a['os'] }}</td><td data-label="Приложение">{{ a['app'] }}</td><td><a class="btn sec" href="{{ a['url'] }}" target="_blank" rel="noopener">Скачать</a></td></tr>{% endfor %}</table></div>
-<h2>Мобильные</h2><div class="card"><table><tr><th>ОС</th><th>Приложение</th><th></th></tr>
+<h2>Мобильные</h2><div class="card"><table><thead><tr><th>ОС</th><th>Приложение</th><th></th></tr></thead>
 {% for a in mob %}<tr><td>{{ a['os'] }}</td><td data-label="Приложение">{{ a['app'] }}</td><td><a class="btn sec" href="{{ a['url'] }}" target="_blank" rel="noopener">Скачать</a></td></tr>{% endfor %}</table></div>
 <p class="hint">Ссылки ведут на официальные источники. Установщики мы не хостим.</p>
 """, pc=apps('pc'), mob=apps('mobile'))
@@ -462,13 +465,13 @@ def admin():
     b = render_template_string("""<h1>Админка</h1>
 <div class="card"><a class="btn sec" href="/admin/stats">Статистика и трафик</a> <a class="btn sec" href="/admin/account">Логин и пароль</a></div>
 <div class="card"><h2>Участники и личные коды</h2>
-<table><tr><th>Имя</th><th>Личный код</th><th>Устройств</th><th></th></tr>
-{% for m in members %}<tr><td>{{ m['name'] }}</td><td><code>{{ m['code'] or '-' }}</code></td><td>{{ m['n'] }}</td>
+<table><thead><tr><th>Имя</th><th>Личный код</th><th>Устройств</th><th></th></tr></thead>
+{% for m in members %}<tr><td>{{ m['name'] }}</td><td data-label="Личный код"><code>{{ m['code'] or '-' }}</code></td><td data-label="Устройств">{{ m['n'] }}</td>
 <td><a class="btn sec" href="/admin/member/{{ m['id'] }}/revoke_code" onclick="return confirm('Выпустить новый код? Старый сразу перестанет работать.')">Отозвать код</a>
 <a class="btn err" href="/admin/member/{{ m['id'] }}/delete" onclick="return confirm('Удалить участника и все его ключи?')">Удалить</a></td></tr>
 {% else %}<tr><td colspan="4" class="hint">Пока никого.</td></tr>{% endfor %}</table>
 <p class="hint">Личный код участник вводит в кабинете, чтобы увидеть свой QR. Отдайте код лично.</p></div>
-<div class="card"><h2>Устройства</h2><table><tr><th>Участник</th><th>Устройство</th><th>Протокол</th><th>Статус</th><th></th></tr>
+<div class="card"><h2>Устройства</h2><table><thead><tr><th>Участник</th><th>Устройство</th><th>Протокол</th><th>Статус</th><th></th></tr></thead>
 {% for d in devices %}<tr><td>{{ d['mn'] }}{% if d['mt'] %}<br><span class="mut">{{ d['mt'] }}</span>{% endif %}<br><span class="mut">код: {{ d['code'] or '-' }}</span></td>
 <td data-label="Устройство">{{ d['label'] }}<br><span class="mut">{{ d['vpn_name'] }}</span></td><td data-label="Протокол">{{ d['protocol'] }}</td>
 <td data-label="Статус"><span class="tag {{ d['status'] }}">{{ d['status'] }}</span>{% if d['note'] %}<br><span class="mut">{{ d['note'] }}</span>{% endif %}</td>
@@ -491,11 +494,11 @@ def admin():
 <div class="row"><div><label>Использований</label><input name="max_uses" value="1"></div>
 <div><label>Срок, дней</label><input name="days" value="7"></div>
 <div><label>Заметка</label><input name="note"></div></div><button>Создать приглашение</button></form>
-<table><tr><th>Токен</th><th>Исп.</th><th>Срок</th><th>QR</th></tr>
+<table><thead><tr><th>Токен</th><th>Исп.</th><th>Срок</th><th>QR</th></tr></thead>
 {% for i in invites %}<tr><td><code>{{ i['token'] }}</code></td><td>{{ i['uses'] }}/{{ i['max_uses'] }}</td><td>{{ i['expires_at'] or '-' }}</td>
 <td><a class="btn sec" href="/admin/invite/{{ i['token'] }}/qr.png" target="_blank">QR</a></td></tr>{% endfor %}</table>
 <p class="hint">QR ведёт на страницу регистрации. Покажите его новому участнику.</p></div>
-<div class="card"><h2>Взносы</h2><table><tr><th>Сумма</th><th>Способ</th><th>Статус</th><th>Сообщение</th><th></th></tr>
+<div class="card"><h2>Взносы</h2><table><thead><tr><th>Сумма</th><th>Способ</th><th>Статус</th><th>Сообщение</th><th></th></tr></thead>
 {% for c in contrib %}<tr><td>{{ c['amount'] }}</td><td>{{ c['method'] }}</td><td>{{ c['status'] }}</td><td>{{ c['message'] or '' }}</td>
 <td>{% if c['status'] != 'confirmed' %}<a class="btn ok" href="/admin/contribution/{{ c['id'] }}/confirm">Подтвердить</a>{% endif %}</td></tr>{% endfor %}</table></div>
 <div class="card"><h2>Настройки</h2><form method="post" action="/admin/settings"><input type="hidden" name="csrf" value="{{ csrf }}">
@@ -711,15 +714,44 @@ a{color:var(--acc)}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;text-decoration:none;color:var(--tx3);font-size:11px;border-radius:10px}
 .nav a.on{color:var(--acc)}
 .nav a i{font-size:19px;font-style:normal;line-height:1}
+/* --- адаптивность и масштабирование --- */
+body{font-size:clamp(15px,0.26vw + 14.2px,17px)}
+.topnav{display:none;gap:2px;margin-left:14px;flex-wrap:wrap}
+.topnav a{font-size:.92em;color:var(--tx3);text-decoration:none;padding:7px 10px;border-radius:9px}
+.topnav a.on{color:var(--tx);background:var(--surf2)}
+.nav a{font-size:clamp(9.5px,2.8vw,12px);white-space:nowrap;overflow:hidden}
+.nav svg{width:1.6em;height:1.6em;min-width:20px;min-height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+main{max-width:min(760px,100%);margin:0 auto;padding:14px}
+img.qr{width:min(76vw,260px)}
+@media (min-width:641px){.nav{display:none}body{padding-bottom:26px}.topnav{display:flex}main{max-width:820px;padding:18px}}
+@media (min-width:1200px){main{max-width:960px}}
+@media (max-width:640px){
+thead{display:none}
+table,tbody,tr,td{display:block;width:100%}
+tr{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin:10px 0}
+td{border:0;padding:5px 0;display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:right}
+td:first-child{font-weight:600;text-align:left;justify-content:flex-start;font-size:1.05em;padding-bottom:8px;border-bottom:1px solid var(--bd);margin-bottom:4px}
+td[data-label]::before{content:attr(data-label);color:var(--tx3);font-size:.85em;font-weight:400;text-align:left;margin-right:auto}
+td:empty{display:none}
+td .btn{margin:4px 0 4px 6px;min-height:40px;font-size:.9em;padding:8px 13px}
+}
+@media (max-width:360px){.nav a{font-size:9px}.nav svg{min-width:18px;min-height:18px}}
+.nav a{min-width:0;text-overflow:ellipsis}
+@media (max-width:640px){
+tr:has(th){display:none}
+td{flex-wrap:wrap}
+td:last-child{justify-content:flex-end}
+td .btn{flex:0 0 auto}
+}
 </style></head><body>
 <header><div class="logo">{{ brand[:1] }}</div><div class="name">{{ brand }}</div>
-{% if session.get('guest') or session.get('admin') %}<a class="out" href="/logout">Выйти</a>{% endif %}</header>
+{% if session.get('guest') or session.get('admin') %}<nav class="topnav"><a href="/cabinet" class="{{ 'on' if active=='cabinet' else '' }}">Кабинет</a><a href="/connect" class="{{ 'on' if active=='connect' else '' }}">Приложения</a>{% if session.get('admin') %}<a href="/admin" class="{{ 'on' if active=='admin' else '' }}">Админка</a>{% endif %}</nav><a class="out" href="/logout">Выйти</a>{% endif %}</header>
 <main>{{ body|safe }}</main>
 {% if session.get('guest') or session.get('admin') %}
 <nav class="nav">
-<a href="/cabinet" class="{{ 'on' if active=='cabinet' else '' }}"><i>⌂</i>Кабинет</a>
-<a href="/connect" class="{{ 'on' if active=='connect' else '' }}"><i>↓</i>Приложения</a>
-{% if session.get('admin') %}<a href="/admin" class="{{ 'on' if active=='admin' else '' }}"><i>⚙</i>Админка</a>{% endif %}
+<a href="/cabinet" class="{{ 'on' if active=='cabinet' else '' }}"><svg viewBox="0 0 24 24"><path d="M3 10.4 12 3l9 7.4"/><path d="M5.5 9.6V21h13V9.6"/></svg>Кабинет</a>
+<a href="/connect" class="{{ 'on' if active=='connect' else '' }}"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 21h16"/></svg>Приложения</a>
+{% if session.get('admin') %}<a href="/admin" class="{{ 'on' if active=='admin' else '' }}"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3Z"/></svg>Админка</a>{% endif %}
 </nav>{% endif %}
 </body></html>"""
 
@@ -837,7 +869,7 @@ def admin_stats():
     rows = db().execute("""SELECT d.*, m.name AS mn FROM devices d JOIN members m ON m.id=d.member_id
         ORDER BY d.online DESC, d.id DESC""").fetchall()
     b = render_template_string("""<h1>Статистика</h1>
-<div class="card"><table><tr><th>Участник</th><th>Устройство</th><th>Протокол</th><th>Статус</th><th>Скачано</th><th>Отдано</th><th>Был(а)</th><th></th></tr>
+<div class="card"><table><thead><tr><th>Участник</th><th>Устройство</th><th>Протокол</th><th>Статус</th><th>Скачано</th><th>Отдано</th><th>Был(а)</th><th></th></tr></thead>
 {% for d in rows %}<tr><td>{{ d['mn'] }}</td><td data-label="Устройство">{{ d['vpn_name'] }}</td><td data-label="Протокол">{{ d['protocol'] }}</td>
 <td data-label="Статус">{% if d['online'] %}<span class="tag approved">онлайн</span>{% else %}<span class="tag">офлайн</span>{% endif %}</td>
 <td data-label="Скачано">{{ f(d['traffic_down']) }}<br><span class="mut">сессия {{ f(d['sess_down']) }}</span></td>
